@@ -1,0 +1,9 @@
+#compdef killall
+
+if [[ $service = killall && "$OSTYPE" = (linux*|*bsd*|darwin*) ]]; then
+  _alternative \
+    'signals:: _signals -p' \
+    'processes-names:process:{ compadd "$expl[@]" ${${${${(f)"$(_call_program processes-names ps xU moi ho %c 2> /dev/null)"//[][\(\)]/}:#(ps|COMMAND|-*)}%%\ *}:t} }'
+else
+  _signals -p
+fi

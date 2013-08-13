@@ -1,0 +1,21 @@
+#compdef unison unison-gtk
+
+_unison_command() {
+    if (( CURRENT == 1 )); then
+	local list 
+	local oifs
+	oifs="$IFS"
+	IFS="
+"
+	list=($(ls $HOME/.unison/*.prf | sed 's?.*/\.unison/\(.*\)\.prf?\1?'))
+	IFS="$oifs"
+	_describe profile list
+    fi
+    _files -/
+}
+
+_unison() {
+    _arguments '*::unison command:_unison_command'
+}
+
+_unison "$@"

@@ -1,0 +1,5 @@
+#compdef pidof
+
+_alternative \
+    'signals:: _signals -p' \
+    'processes-names:process:{ compadd "$expl[@]" ${${${${(f)"$(_call_program processes-names ps xa ho %c 2> /dev/null)"//[][\(\)]/}:#(ps|COMMAND|-*)}%%\ *}:t} }'
