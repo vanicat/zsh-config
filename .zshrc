@@ -1,8 +1,6 @@
-# Lines configured by zsh-newuser-install
 HISTFILE=~/.histfile
 HISTSIZE=5000
 SAVEHIST=5000
-# End of lines configured by zsh-newuser-install
 
 #
 # Example .zshrc file for zsh 4.0
