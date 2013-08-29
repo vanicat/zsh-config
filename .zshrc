@@ -58,36 +58,29 @@ typeset -ga chpwd_functions
 
 setopt prompt_subst
 
-export __CURRENT_GIT_BRANCH=
+autoload -Uz vcs_info
+zstyle ':vcs_info:*' actionformats '%F{5}(%f%s%F{5})%F{3}-%F{5}[%F{2}%b%F{3}|%F{1}%a%F{5}]%f'
+zstyle ':vcs_info:*' formats '%F{0}(%B%s%%b%F{0})%%b-[%B%b%%b]'
+zstyle ':vcs_info:(sv[nk]|bzr):*' branchformat '%b%F{1}:%F{3}%r'
+zstyle ':vcs_info:*' enable git svn
 
-parse_git_branch() {
-    git branch --no-color 2> /dev/null \
-	| sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
+precmd() {
+    vcs_info
 }
 
-preexec_functions+='zsh_preexec_update_git_vars'
-zsh_preexec_update_git_vars() {
-    case "$(history $HISTCMD)" in
-        *git*)
-            export __CURRENT_GIT_BRANCH="$(parse_git_branch)"
-            ;;
-    esac
-}
+setopt prompt_subst
 
-chpwd_functions+='zsh_chpwd_update_git_vars'
-zsh_chpwd_update_git_vars() {
-    export __CURRENT_GIT_BRANCH="$(parse_git_branch)"
-}
-
-get_git_prompt_info() {
-    echo $__CURRENT_GIT_BRANCH
-}
 
 # Set prompts
-PROMPT='%n@%m${SCHROOT_SESSION_ID%%-*}'    # default prompt
-RPROMPT='$(get_git_prompt_info) %~'     # prompt for right side of screen
-[[ -n $VCSH_DIRECTORY ]] && PROMPT+="%{$fg_bold[yellow]%} [$VCSH_DIRECTORY]"
-PROMPT+='%# '
+PS1='%n@%m${SCHROOT_SESSION_ID%%-*}'    # default prompt
+[[ -n $VCSH_DIRECTORY ]] && PS1+="! "
+PS1+="%# "
+
+RPS1=''                         # prompt for right side of screen
+[[ -n $VCSH_DIRECTORY ]] && RPS1+="[${VCSH_DIRECTORY}]"
+RPS1+='${vcs_info_msg_0_}-%B%F{2}%~%b'
+
+
 
 # Some environment variables
 export MAIL=/var/spool/mail/$USERNAME
@@ -211,16 +204,5 @@ sshtmp () {
 sshnew () {
   ssh -o "StrictHostKeyChecking no" "$@"
 }
-
-case $TERM in
-    xterm*|screen*)
-        precmd () {print -Pn "\e]0;%n@%m: %~\a"}
-        ;;
-    dumb) # tramp
-        unsetopt zle
-	PROMPT='$'
-	RPROMPT=''
-        ;;
-esac
 
 export ORG_HOME="/home/moi/lang/elisp/org-mode/"
