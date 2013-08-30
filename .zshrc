@@ -206,3 +206,7 @@ sshnew () {
 }
 
 export ORG_HOME="/home/moi/lang/elisp/org-mode/"
+
+
+# Set the xterm/tmux title.
+print -nP "\e]2;%l %n@%m: %~\a"
