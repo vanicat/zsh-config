@@ -61,6 +61,34 @@ _xmms2_collection() {
     _call_function ret _xmms2_collection_$cmd
 }
 
+_xmms2_collection_config() {
+    local list
+    list=($(xmms2 collection list))
+    _describe -t command "xmms2 collection" list
+}
+
+_xmms2_collection_remove() {
+    local list
+    list=($(xmms2 collection list))
+    _describe -t command "xmms2 collection" list
+}
+
+_xmms2_collection_show() {
+    local list
+    list=($(xmms2 collection list))
+    _describe -t command "xmms2 collection" list
+}
+
+_xmms2_collection_rename() {
+    local list
+    list=($(xmms2 collection list))
+    if (( CURRENT == 3 )); then
+	_describe -t command "xmms2 collection" list
+    else
+	_describe -t command "new name"
+    fi
+}
+
 _xmms2_playlist() {
     local playlist_cmds
     playlist_cmds=(
@@ -84,6 +112,65 @@ _xmms2_playlist() {
 
     local curcontext="${curcontext%:*}:xmms2-${cmd}"
     _call_function ret _xmms2_playlist_$cmd
+}
+
+_xmms2_playlist_helper() {
+    xmms2 playlist list | sed 's/^\*/ /'
+}
+
+_xmms2_playlist_clear() {
+    local list
+    list=($(_xmms2_playlist_helper))
+    _describe -t command "xmms2 playlists" list
+}
+
+_xmms2_playlist_config() {      # There are other stuff to complete on
+    local list
+    list=($(_xmms2_playlist_helper))
+    _describe -t command "xmms2 playlists" list
+}
+
+_xmms2_playlist_remove() {      # There are other stuff to complete on
+    local list
+    list=($(_xmms2_playlist_helper))
+    _describe -t command "xmms2 playlists" list
+}
+
+_xmms2_playlist_shuffle() {
+    local list
+    list=($(_xmms2_playlist_helper))
+    _describe -t command "xmms2 playlists" list
+}
+
+_xmms2_playlist_sort() {
+    local prop
+    prop=(
+	artist
+	artist-
+	title
+	title-
+	album
+	album-
+	rating
+	rating-
+	date
+	date-
+	genre
+	genre-
+	laststarted
+	laststarted-
+	performer
+	performer-
+	timesplayed
+	timesplayed-
+    )
+    _describe -t command "xmms2 playlists" prop
+}
+
+_xmms2_playlist_switch() {
+    local list
+    list=($(_xmms2_playlist_helper))
+    _describe -t command "xmms2 playlists" list
 }
 
 _xmms2_server() {
@@ -113,7 +200,7 @@ _xmms2_server() {
     _call_function ret _xmms2_server_$cmd
 }
 
- _xmms2_jump() {
+_xmms2_jump() {
      songlist=(${"$(xmms2 list)"})
      playlistitems=()
      for song ($songlist); do 
@@ -121,67 +208,9 @@ _xmms2_server() {
 		    playlistitems+=("$match[1][$match[3]]")
 	 fi
      done
-     
+
      _values -s ' ' 'playlist items' ${(On)playlistitems}
 
-}
-
-_xmms2_playlist_load() {
-    local list
-    list=($(xmms2 playlist list))
-    _describe -t command "xmms2 playlists" list
-}
-
-
-_xmms2_playlist_remove() {
-    local list
-    list=($(xmms2 playlist list))
-    _describe -t command "xmms2 playlists" list
-}
-
-
-_xmms2_coll_helper() {
-    local list
-    list=($(xmms2 coll list))
-    _describe -t command "xmms2 playlists" list
-}
-
-_xmms2_coll_rename() {
-    _xmms2_coll_helper
-}
-
-_xmms2_coll_remove() {
-    _xmms2_coll_helper
-}
-
-_xmms2_coll_get() {
-    _xmms2_coll_helper
-}
-
-_xmms2_coll_query() {
-    _xmms2_coll_helper
-}
-
-_xmms2_coll_queryadd() {
-    _xmms2_coll_helper
-}
-
-_xmms2_coll_attr() {
-    _xmms2_coll_helper
-}
-
-_xmms2_add() {
-  _files
-}
-
-_xmms2_radd() {
-  _dirs
-}
-
-_xmms2_addpls() {
-  local expl
-  _description files expl 'playlist'
-  _files "$expl[@]" -g '*.([mM]3[uU]|[pP][lL][sS])(-.)'
 }
 
 _xmms2() {
