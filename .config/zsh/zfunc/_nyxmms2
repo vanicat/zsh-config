@@ -1,0 +1,205 @@
+#compdef nyxmms2
+
+_nyxmms2_command() {
+    local nyxmms2_cmds
+
+    nyxmms2_cmds=(
+	add:"add the matching media or files to a playlist"
+	list:"lists the playlist"
+	search:"Search and print all media matching the pattern"
+	remove:"remove the matching media from a playlist"
+
+	play:"starts playback"
+	pause:"pause playback"
+	stop:"stops playback"
+	toggle:"toggles playback status between play/pause"
+
+	seek:"seek to a specific place in current song"
+	next:"play next song"
+	prev:"play previous song"
+	jump:"take a leap in the playlist"
+
+	move:"move a entry in the playlist"
+	collection:"collection manipulation"
+	playlist:"playlist manipulation"
+	server:"server manipulation"
+
+	status:"display playback status, either continuously or once"
+	info:"display properties for media"
+	help:"print help about a command"
+    )
+
+    if (( CURRENT == 1 )); then
+	_describe -t command "nyxmms2 commands" nyxmms2_cmds
+    else
+	local curcontext="$curcontext"
+    fi
+
+    local cmd=$words[1]
+
+    local curcontext="${curcontext%:*}:nyxmms2-${cmd}"
+    _call_function ret _nyxmms2_$cmd
+}
+
+_nyxmms2_jump() {
+    songlist=(${"$(nyxmms2 list)"})
+    playlistitems=()
+    for song ($songlist); do
+	if [[ $song = (#b)'  '\[(<->)/(<->)\]' '(*)' '\((*)\) ]]; then
+			playlistitems+=("$match[1][$match[3]]")
+	fi
+    done
+
+    _values -s ' ' 'playlist items' ${(On)playlistitems}
+
+}
+
+_nyxmms2_playlist() {
+    local playlist_cmds
+    playlist_cmds=(
+	list:"list all playlists"
+	switch:"change the active playlist"
+	create:"create a new playlist"
+	rename:"rename a playlist"
+	remove:"remove the given playlist"
+	clear:"clear a playlist, by default, clear the active playlist"
+	shuffle:"shuffle a playlist, by default, shuffle the active playlist"
+	sort:"sort a playlist, by default, sort the active playlist."
+	config:"configure a playlist, by default, sort the active playlist."
+    )
+    if (( CURRENT == 2 )); then
+	_describe -t command "nyxmms2 playlist commands" playlist_cmds
+    else
+	local curcontext="$curcontext"
+    fi
+
+    local cmd=$words[2]
+
+    local curcontext="${curcontext%:*}:nyxmms2-${cmd}"
+    _call_function ret _nyxmms2_playlist_$cmd
+}
+
+_nyxmms2_playlist_helper() {
+    local list
+    oifs="$IFS"
+    IFS="
+"
+    list=($(nyxmms2 playlist list|sed 's/^..//'))
+    IFS="$oifs"
+    _describe -t command "nyxmms2 playlists" list
+}
+
+_nyxmms2_playlist_switch() {
+    _nyxmms2_playlist_helper
+}
+
+_nyxmms2_playlist_sort() {
+    _nyxmms2_playlist_helper
+}
+
+_nyxmms2_playlist_shuffle() {
+    _nyxmms2_playlist_helper
+}
+
+_nyxmms2_playlist_clear() {
+    _nyxmms2_playlist_helper
+}
+
+_nyxmms2_playlist_remove() {
+    _nyxmms2_playlist_helper
+}
+
+_nyxmms2_playlist_config() {
+    _nyxmms2_playlist_helper
+}
+
+#FIXME: TODO rename, other sort args, config
+_nyxmms2_collection() {
+    local collection_cmds
+    collection_cmds=(
+	list:"list all collection"
+	show:"display a human-readable description of a collection"
+	create:"create a new collection"
+	rename:"rename a collection"
+	remove:"remove a collection"
+	config:"get or set attributes for the given collection"
+    )
+    if (( CURRENT == 2 )); then
+	_describe -t command "nyxmms2 collection commands" collection_cmds
+    else
+	local curcontext="$curcontext"
+    fi
+
+    local cmd=$words[2]
+
+    local curcontext="${curcontext%:*}:nyxmms2-${cmd}"
+    _call_function ret _nyxmms2_collection_$cmd
+}
+
+_nyxmms2_collection_helper() {
+    local list
+    oifs="$IFS"
+    IFS="
+    "
+    list=($(nyxmms2 collection list|sed 's/^..//'))
+    IFS="$oifs"
+    _describe -t command "nyxmms2 playlists" list
+}
+
+_nyxmms2_collection_rename() {
+    _nyxmms2_collection_helper
+}
+
+_nyxmms2_collection_config() {
+    _nyxmms2_collection_helper
+}
+_nyxmms2_collection_remove() {
+    _nyxmms2_collection_helper
+}
+
+_nyxmms2_collection_show() {
+    _nyxmms2_collection_helper
+}
+
+_nyxmms2_add() {
+    _files
+}
+
+_nyxmms2_server() {
+    local collection_cmds
+    collection_cmds=(
+	import:"Import new file in the media library"
+	remove:"Remove the matching media from the media library."
+	rehash:"Rehash the media matched by the pattern"
+	config:"Get or set configuration value"
+	property:"Get or set properties for a given media"
+	plugins:"List the plugins loaded in the server"
+	volume:"Get or set the audio volume (in a range of 0-100)"
+	stats:"Display statistics about the server"
+	sync:"Force the saving of collections to the disk"
+	shutdown:"Shutdown the server."
+    )
+    if (( CURRENT == 2 )); then
+	_describe -t command "nyxmms2 server commands" collection_cmds
+    else
+	local curcontext="$curcontext"
+    fi
+
+    local cmd=$words[2]
+
+    local curcontext="${curcontext%:*}:nyxmms2-${cmd}"
+    _call_function ret _nyxmms2_server_$cmd
+}
+
+_nyxmms2_server_import() {
+    _files
+}
+
+_nyxmms2() {
+    _arguments \
+	'--format[specify the format of song display]:format string' \
+	'--no-status[prevent printing song status on completion]' \
+	'*::nyxmms2 command:_nyxmms2_command'
+}
+
+_nyxmms2 "$@"
