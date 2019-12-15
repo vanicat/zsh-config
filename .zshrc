@@ -213,3 +213,17 @@ print -nP "\e]2;%l %n@%m: %~\a"
 
 [ $TERM = "dumb" ] && unsetopt zle && PS1='$ '
 
+###-tns-completion-start-###
+if [ -f /home/moi/.tnsrc ]; then 
+    source /home/moi/.tnsrc 
+fi
+###-tns-completion-end-###
+
+export ANDROID_HOME=/home/moi/Android/Sdk
+path /home/moi/prog/jdk1.8.0_231/bin
+path /home/moi/prog/node/bin
+export JAVA_HOME=/home/moi/prog/jdk1.8.0_231
+endpath $ANDROID_HOME/tools
+endpath $ANDROID_HOME/tools/bin
+endpath $ANDROID_HOME/platform-tools
+endpath $ANDROID_HOME/emulator
